@@ -92,7 +92,6 @@ addon_data.hunter.casting = false
 addon_data.hunter.casting_auto = false
 addon_data.hunter.range_cast_speed_modifer = 1
 
-addon_data.hunter.range_weapon_id = 0
 addon_data.hunter.has_moved = false
 
 -- handling of stopping auto timer from starting
@@ -144,14 +143,7 @@ end
 addon_data.hunter.OnInventoryChange = function()
 	local _, class, _ = UnitClass("player")
 	if (class == "HUNTER" or class == "MAGE" or class == "PRIEST" or class == "WARLOCK") then
-		addon_data.hunter.range_weapon_id = GetInventoryItemID("player", 18)
-		local weapon_id = addon_data.hunter.range_weapon_id
-	
-		if weapon_id == nil then
-			addon_data.hunter.base_speed = 1
-		else
-			addon_data.hunter.base_speed = addon_data.ranged_DB.item_ids[weapon_id].base_speed
-		end
+		addon_data.hunter.base_speed = addon_data.GetRangedBaseSpeed()
 	end
 end	
 
@@ -159,8 +151,7 @@ end
 addon_data.hunter.FeignDeath = function()
     addon_data.hunter.last_shot_time = GetTime()
 	if not addon_data.hunter.FeignFullReset then
-		local weapon_id = GetInventoryItemID("player", 18)
-		addon_data.hunter.range_speed = addon_data.ranged_DB.item_ids[weapon_id].base_speed + 0.15
+		addon_data.hunter.range_speed = addon_data.GetRangedBaseSpeed() + 0.15
 		addon_data.hunter.FeignFullReset = true
 	end
     addon_data.hunter.ResetShotTimer()
@@ -171,14 +162,7 @@ addon_data.hunter.UpdateRangeCastSpeedModifier = function()
 	local _, class, _ = UnitClass("player")
 	
 	if addon_data.hunter.base_speed == 1 and (class == "HUNTER" or class == "MAGE" or class == "PRIEST" or class == "WARLOCK") then 
-		addon_data.hunter.range_weapon_id = GetInventoryItemID("player", 18)
-		local weapon_id = addon_data.hunter.range_weapon_id
-		-- added case for if no ranged equipped
-		if weapon_id == nil then
-			addon_data.hunter.base_speed = 1
-		else
-			addon_data.hunter.base_speed = addon_data.ranged_DB.item_ids[weapon_id].base_speed
-		end
+		addon_data.hunter.base_speed = addon_data.GetRangedBaseSpeed()
 	else
 		range_speed, _, _, _, _, _ = UnitRangedDamage("player")
 		-- added case for if range speed returns nil or 0
